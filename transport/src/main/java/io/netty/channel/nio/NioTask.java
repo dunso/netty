@@ -20,17 +20,22 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
 /**
+ * 用于自定义 Nio 事件处理接口。对于每个 Nio 事件，可以认为是一个任务( Task )，
+ *
  * An arbitrary task that can be executed by {@link NioEventLoop} when a {@link SelectableChannel} becomes ready.
  *
  * @see NioEventLoop#register(SelectableChannel, int, NioTask)
  */
 public interface NioTask<C extends SelectableChannel> {
     /**
+     * 处理 Channel IO 就绪的事件。相当于说，我们可以通过实现该接口方法
      * Invoked when the {@link SelectableChannel} has been selected by the {@link Selector}.
      */
     void channelReady(C ch, SelectionKey key) throws Exception;
 
     /**
+     * Channel 取消注册。一般来说，我们可以通过实现该接口方法，关闭 Channel 。
+     *
      * Invoked when the {@link SelectionKey} of the specified {@link SelectableChannel} has been cancelled and thus
      * this {@link NioTask} will not be notified anymore.
      *

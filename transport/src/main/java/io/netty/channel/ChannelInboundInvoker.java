@@ -15,6 +15,32 @@
  */
 package io.netty.channel;
 
+/**
+ * 通知 Channel 事件的接口方法。
+ *
+ * 对于 Inbound 事件：
+ *
+ * Inbound 事件是【通知】事件, 当某件事情已经就绪后, 通知上层.
+ * Inbound 事件发起者是 Unsafe
+ * Inbound 事件的处理者是 TailContext, 如果用户没有实现自定义的处理方法, 那么Inbound 事件默认的处理者是 TailContext, 并且其处理方法是空实现.
+ * Inbound 事件在 Pipeline 中传输方向是 head( 头 ) -> tail( 尾 )
+ *
+ * 在 ChannelHandler 中处理事件时, 如果这个 Handler 不是最后一个 Handler,
+ * 则需要调用 ctx.fireIN_EVT (例如 ctx.fireChannelActive ) 将此事件继续传播下去.
+ * 如果不这样做, 那么此事件的传播会提前终止.
+ *
+ * Inbound 事件流: Context.fireIN_EVT -> Connect.findContextInbound ->
+ * nextContext.invokeIN_EVT -> nextHandler.IN_EVT -> nextContext.fireIN_EVT
+ *
+ * Inbound 事件的传播，比起 Outbound 事件的传播，会相对“绕”一点点。简化来说，实际大概是如下：
+ *
+ * Unsafe 开始 => DefaultChannelPipeline#fireChannelActive
+ * => HeadContext#invokeChannelActive => DefaultChannelHandlerContext01#fireChannelActive
+ * => DefaultChannelHandlerContext01#invokeChannelActive => DefaultChannelHandlerContext02#fireChannelActive
+ * ...
+ * => DefaultChannelHandlerContext99#fireChannelActive => TailContext#fireChannelActive
+ * => TailContext#invokeChannelActive => 结束
+ */
 public interface ChannelInboundInvoker {
 
     /**

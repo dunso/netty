@@ -115,12 +115,22 @@ public class DefaultPromise<V> extends AbstractFuture<V> implements Promise<V> {
         throw new IllegalStateException("complete already: " + this, cause);
     }
 
+    /**
+     * 通知 Promise 的监听器们，发生了异常
+     * @param cause
+     * @return
+     */
     @Override
     public boolean tryFailure(Throwable cause) {
+        // 设置 Promise 的结果
+        // 设置 Promise 的结果为方法传入的异常。但是有可能会传递失败，例如说，Promise 已经被设置了结果。
         if (setFailure0(cause)) {
+            // 通知监听器
             notifyListeners();
+            // 返回成功
             return true;
         }
+        // 返回失败
         return false;
     }
 

@@ -21,8 +21,18 @@ final class DefaultChannelHandlerContext extends AbstractChannelHandlerContext {
 
     private final ChannelHandler handler;
 
+    /**
+     *
+     * @param pipeline
+     * @param executor
+     * @param name
+     * @param handler 内嵌的 ChannelHandler 对象
+     */
     DefaultChannelHandlerContext(
             DefaultChannelPipeline pipeline, EventExecutor executor, String name, ChannelHandler handler) {
+        // 调用父 AbstractChannelHandlerContext 的构造方法，
+        // 通过判断传入的 handler 是否为 ChannelInboundHandler 和 ChannelOutboundHandler
+        // 来分别判断是否为 inbound 和 outbound 。
         super(pipeline, executor, name, isInbound(handler), isOutbound(handler));
         if (handler == null) {
             throw new NullPointerException("handler");

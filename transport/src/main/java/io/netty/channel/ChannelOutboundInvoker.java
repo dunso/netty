@@ -21,6 +21,24 @@ import io.netty.util.concurrent.FutureListener;
 import java.net.ConnectException;
 import java.net.SocketAddress;
 
+/**
+ * 发起 Channel 操作的接口方法,创建 Promise 对象的接口方法。
+ *
+ * 对于 Outbound 事件：
+ *
+ * Outbound 事件是【请求】事件(由 Connect 发起一个请求, 并最终由 Unsafe 处理这个请求)
+ * Outbound 事件的发起者是 Channel
+ * Outbound 事件的处理者是 Unsafe
+ * Outbound 事件在 Pipeline 中的传输方向是 tail -> head
+ *
+ * 在 ChannelHandler 中处理事件时, 如果这个 Handler 不是最后一个 Handler,
+ * 则需要调用 ctx.xxx (例如 ctx.connect ) 将此事件继续传播下去.
+ * 如果不这样做, 那么此事件的传播会提前终止.
+ *
+ * Outbound 事件流: Context.OUT_EVT -> Connect.findContextOutbound ->
+ * nextContext.invokeOUT_EVT -> nextHandler.OUT_EVT -> nextContext.OUT_EVT
+ *
+ */
 public interface ChannelOutboundInvoker {
 
     /**
